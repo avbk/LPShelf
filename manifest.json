@@ -1,0 +1,17 @@
+{
+	"BundleIdentifier" : "shelf",
+	"BundleVersion" : "0.0.1",
+    "BundleType": "Application",
+	"RequiredInterface" : 1,
+	"VendorIdentifier": "avbk",
+	
+    "AppIcon": {
+        "36x18": "img/icon.png"
+    },
+    "AppName": {
+		"en": "LP Shelf"
+    },
+	"RequiredPermissions": [ "http://ws.spotify.com"],
+    "SupportedLanguages": ["en"],
+	"AcceptedLinkTypes" : ["album", "artist"]
+}
