@@ -1,7 +1,7 @@
 .sp-image-loaded {
-	width: 200px;
-	height: 200px;
-	margin: 10px;
+	width: 180px;
+	height: 180px;
+	margin: 5px;
 	position: relative;
 }
 
@@ -24,7 +24,7 @@
 	color: #000;
 	margin: 5px 10px;
 	
-	max-width: 150px;
+	max-width: 75%;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -37,7 +37,7 @@
 	font-variant: small-caps;
 	margin: 5px 10px;
 	
-	max-width: 150px;
+	max-width: 75%;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
