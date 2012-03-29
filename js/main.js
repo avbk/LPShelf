@@ -19,20 +19,19 @@ $(function() {
     models =  sp.require('sp://import/scripts/api/models');
     views =  sp.require('sp://import/scripts/api/views');
     ui = sp.require('sp://import/scripts/dnd');
-    templateEngine = new TemplateEngine('/tpl');
-        
+    templateEngine = new TemplateEngine('/tpl', ['album'], function()  {     	
+        models.application.observe(models.EVENT.ACTIVATE, function() {
+            });
 	
-    models.application.observe(models.EVENT.ACTIVATE, function() {
+        models.application.observe(models.EVENT.LINKSCHANGED, function() {
+            for (var i = 0; i < models.application.links.length; i++)
+                handleImport(models.application.links[i]);
         });
-	
-    models.application.observe(models.EVENT.LINKSCHANGED, function() {
-        for (var i = 0; i < models.application.links.length; i++)
-            handleImport(models.application.links[i]);
+        for (var id in localStorage) {
+            models.Album.fromURI(albumPrefix+id, drawAlbum);
+        }
+        
     });
-	
-    for (var id in localStorage) {
-        models.Album.fromURI(albumPrefix+id, drawAlbum);
-    }
 })
 
 function onButtonPlayClick() {
@@ -65,36 +64,35 @@ function createHTML(album) {
 } 
 
 function drawAlbum(album) {
-    templateEngine.load("album", {
+    // OLD Creation
+    //img = createHTML(album);
+    img = templateEngine.load("album", {
         album: album
-    }, function(img)  {
-        // OLD Creation
-        //img = createHTML(album);
+    });
         
-        imgs = $('div.sp-image');
+    imgs = $('div.sp-image');
         
-        artistName = album.data.artist.name.toUpperCase();
-        albumYear  = album.data.year;
+    artistName = album.data.artist.name.toUpperCase();
+    albumYear  = album.data.year;
 
-        for (i = 0; i < imgs.length; i++) {
-            otherArtistName = $(imgs[i]).find('artist a').text().toUpperCase();
+    for (i = 0; i < imgs.length; i++) {
+        otherArtistName = $(imgs[i]).find('artist a').text().toUpperCase();
 
-            if (artistName < otherArtistName) {
+        if (artistName < otherArtistName) {
+            $(imgs[i]).before(img);
+            return;
+        } else if (artistName == otherArtistName) {
+            otherAlbumYear = Number($(imgs[i]).find('year').text());
+            if (albumYear < otherAlbumYear) {
                 $(imgs[i]).before(img);
                 return;
-            } else if (artistName == otherArtistName) {
-                otherAlbumYear = Number($(imgs[i]).find('year').text());
-                if (albumYear < otherAlbumYear) {
-                    $(imgs[i]).before(img);
-                    return;
-                }
             }
         }
+    }
 
-        $('body').append(img); 
-        // FIXME: this could be done better
-        $('buttonPlay').click(onButtonPlayClick);
-    });
+    $('body').append(img); 
+    // FIXME: this could be done better
+    $('buttonPlay').click(onButtonPlayClick);
 }
 
 function handleArtistImport(artist) {

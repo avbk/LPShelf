@@ -5,9 +5,31 @@
  * 
  * @param templateDir         The base directory of the templates
  */
-function TemplateEngine(templateDir) {
+function TemplateEngine(templateDir, templateFiles, onReadyCallback) {
     if (templateDir[templateDir.length-1] != '/')
         templateDir += '/';
+    
+    if (typeof templateFiles == "string")
+        templateFiles = [templateFiles];
+    
+    cache = {};
+    __load = function (fileList) {
+        if (fileList.length == 0)
+            onReadyCallback();
+        else {
+            templateName = fileList.pop();
+            $.ajax({
+                url: templateDir +templateName + ".html", 
+                dataType : 'text', 
+                success: function (result) {
+                    cache[templateName] = result;
+                    __load(fileList);
+                }
+            });
+        }
+    }
+    __load(templateFiles);
+        
     
     /**
      * Loads a template and evaluates the javascript commands
@@ -18,18 +40,17 @@ function TemplateEngine(templateDir) {
      * @param templateName    The name of the template file without the <i>.html</i> suffix
      * @param µ               The data, which should be accessable in the template. It
      *                        can be accessed by prepending <i>data.</i>
-     * @param callback        The callback function. Its first 
-     *                        parameter will be the evaluated template
+     *                        
+     * @return                The processed template
      */
-    this.load = function(templateName, µ, callback) {
-        $.ajax({
-            url: templateDir +templateName + ".html", 
-            dataType : 'text', 
-            success: function (result) {
-                callback(result.replace(RegExp("«(.*?)»", "gm"), function(voidParam, js) {
-                    return eval(js);
-                }));
-            }
-        });
+    this.load = function(templateName, µ) {
+        if (templateName in cache) {
+            return cache[templateName].replace(RegExp("«(.*?)»", "gm"), function(voidParam, js) {
+                return eval(js);
+            });
+        } else {
+            console.log("ERROR: template not found: " + templateName);
+            return "";        
+        }
     }
 }
