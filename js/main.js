@@ -2,36 +2,51 @@ function ERR(s) {
     console.log("ERROR: " + s);
 }
 
-var albumPrefix = "spotify:album:";
-
 var sp;
 var models;
 var views;
 var ui;
 var templateEngine;
+var db;
 
 function button(value, type, caption, css) {
     return $('<button class="'+css+' sp-button sp-icon" value="'+value+'"><span class="sp-'+type+'"></span>'+caption+'</button>');
-} 
+}
+
+function init() {
+   inits = [
+    function() {templateEngine = new TemplateEngine('/tpl', ['album'], step);},
+    function() {db = new PlaylistDB(step);}
+   ]
+   cursor = 0;
+    
+    
+    step = function () {
+        if (cursor < inits.length) 
+            inits[cursor++]();
+        else {
+            // POST init
+            models.application.observe(models.EVENT.ACTIVATE, function() {
+                });
+
+            models.application.observe(models.EVENT.LINKSCHANGED, function() {
+                for (var i = 0; i < models.application.links.length; i++)
+                    handleImport(models.application.links[i]);
+            });
+
+            db.foreach(drawAlbum);      
+        }
+    }
+    step();
+}
 
 $(function() {
     sp = getSpotifyApi(1);
     models =  sp.require('sp://import/scripts/api/models');
     views =  sp.require('sp://import/scripts/api/views');
     ui = sp.require('sp://import/scripts/dnd');
-    templateEngine = new TemplateEngine('/tpl', ['album'], function()  {     	
-        models.application.observe(models.EVENT.ACTIVATE, function() {
-            });
-	
-        models.application.observe(models.EVENT.LINKSCHANGED, function() {
-            for (var i = 0; i < models.application.links.length; i++)
-                handleImport(models.application.links[i]);
-        });
-        for (var id in localStorage) {
-            models.Album.fromURI(albumPrefix+id, drawAlbum);
-        }
-        
-    });
+    
+    init();
 })
 
 function onButtonPlayClick() {
@@ -40,8 +55,8 @@ function onButtonPlayClick() {
 
 function onButtonDropClick() {
     albumURI = $(this).parent().find('album a').attr('href');
-    id = albumURI.substr(albumPrefix.length);
-    delete localStorage[id];
+    models.Album.fromURI(albumURI, db.drop);
+    
     $(this).parent().remove();
 }
 
@@ -99,7 +114,7 @@ function handleArtistImport(artist) {
 	
     $.get('http://ws.spotify.com/lookup/1/.json?uri='+artist.uri+'&extras=album', function(metadata) {
         for (i = 0; i < metadata.artist.albums.length; i++) {
-            if (metadata.artist.albums[i].album.availability.territories.indexOf('US') > -1)
+            if (metadata.artist.albums[i].album.availability.territories.indexOf(models.session.country) > -1)
                 models.Album.fromURI(metadata.artist.albums[i].album.href, handleAlbumImport);
         }
     });
@@ -113,11 +128,8 @@ function handleArtistImport(artist) {
 }
 
 function handleAlbumImport(album) {
-    id = album.uri.substr(albumPrefix.length);
-    if (!(id in localStorage)) {
-        localStorage[id] = true;
-        drawAlbum(album);
-    }
+    db.put(album);
+    drawAlbum(album);
 }
 
 function handleImport(spotifyURL) {
