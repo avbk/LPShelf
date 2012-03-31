@@ -42,3 +42,5 @@ server/system
 server/user_guide
 server/application/config
 server/application/logs/*
+client/lpshelf.sublime-workspace
+client/lpshelf.sublime-project
