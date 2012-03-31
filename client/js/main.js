@@ -16,7 +16,7 @@ function button(value, type, caption, css) {
 function init() {
    inits = [
     function() {templateEngine = new TemplateEngine('/tpl', ['album'], step);},
-    function() {db = new PlaylistDB(step);}
+    function() {db = new LocalStorageDB(step);}
    ]
    cursor = 0;
     
@@ -85,7 +85,7 @@ function drawAlbum(album) {
         album: album
     });
         
-    imgs = $('div.sp-image');
+    imgs = $('li.shelfItem');
         
     artistName = album.data.artist.name.toUpperCase();
     albumYear  = album.data.year;
@@ -105,7 +105,7 @@ function drawAlbum(album) {
         }
     }
 
-    $('body').append(img); 
+    $('#shelf').append(img); 
     // FIXME: this could be done better
     $('buttonPlay').click(onButtonPlayClick);
 }
