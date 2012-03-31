@@ -41,3 +41,4 @@ server/license.txt
 server/system
 server/user_guide
 server/application/config
+server/application/logs/*

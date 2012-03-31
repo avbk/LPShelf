@@ -1,4 +1,4 @@
-function DB (initCallback) {
+function DB () {
     /**
      * Put an album into the database
      * 
@@ -22,6 +22,13 @@ function DB (initCallback) {
      */
     this.foreach = function(callback) {}
     
+	/**
+     * Gets all album IDs as one list
+     * 
+	 * @return				the list of saved albums
+     */
+    this.listIDs = function() {return []}
+    
     
     /**
      * Check wheter an album is in the database or not
@@ -32,122 +39,39 @@ function DB (initCallback) {
     this.contains = function(album) {
         return false;
     };
-    
-    if (initCallback != null)
-        window.setTimeout(initCallback, 0);
 }
 
 
-function LocalStorageDB(initCallback) {
-    var albumPrefix = "spotify:album:";
-    
+function LocalStorageDB() {
     this.put = function(album){
         if (!this.contains(album))
-            localStorage[album.uri.substr(albumPrefix.length)] = true;    
+            localStorage[__toID(album)] = true;    
+		
+		return __toURI(album);
     }
     
     this.drop = function(album){
         if (this.contains(album))
-            delete localStorage[album.uri.substr(albumPrefix.length)];
+            delete localStorage[__toID(album)];
+		
+		return __toURI(album);
     }
     
     this.foreach = function(callback) {
         for (var id in localStorage)
-            models.Album.fromURI(albumPrefix+id, callback);
+            models.Album.fromURI(__toURI(id), callback);
     }
  
+	this.listIDs = function() {
+		result = [];
+		for (var id in localStorage)
+			result.push(id);
+		
+		return result;
+	}
+	
     this.contains = function(album) {
-        return album.uri.substr(albumPrefix.length) in localStorage;
+        return __toID(album) in localStorage;
     };
-    
-    if (initCallback != null)
-        window.setTimeout(initCallback, 0);
 }
 LocalStorageDB.prototype = new DB();
-
-
-
-
-function PlaylistDB(initCallback) {
-    var __playlist;
-    
-    this.put = function(album){
-        if (!this.contains(album))
-            __playlist.add(album.tracks[0]);
-    }
-    
-    this.drop = function(album){
-        if (this.contains(album))
-            __playlist.remove(album.tracks[0]);
-    }
-    
-    this.foreach = function(callback) {
-        // TODO __playlist.tracks is kind of deprecated, but why?
-        for (track in __playlist.tracks)
-            callback(track.album);
-    }
- 
-    this.contains = function(album) {
-        /**
-         *
-         *   return __playlist.indexOf(album.tracks[0]) > -1;
-         * TODO: sadly Playlist.indexOf always returning -1;
-         * So using bad O(n)-worst-case implementation
-         */
-        uri = album.tracks[0].uri;
-        for (track in __playlist.tracks)
-            if (uri == track.uri)
-                return true;
-        
-        return false;
-    };
-    
-    
-    __createNewPlaylist = function() {
-        /*
-         * TODO: when creating a new playlist, even with a name, the playlist.uri
-         * is empty. When renaming we can read the uri.
-         */
-        __playlist = new models.Playlist(".loading");
-        __playlist.observe(models.EVENT.RENAME, function (pl) {
-            console.log("onload");
-            console.log(__playlist.uri);
-            console.log(__playlist);
-            console.log(pl.uri);
-            console.log(pl);
-            
-        });
-        console.log(__playlist.uri);
-        console.log(__playlist);
-        __playlist.name = ".lpshelf";
-        localStorage["playlist"] = __playlist.uri;
-        
-        if (initCallback != null)
-            window.setTimeout(initCallback, 0);
-    }
-    
-    if ("playlist" in localStorage) {
-        try {
-            models.Playlist.fromURI(localStorage["playlist"], initCallback);
-        } catch(err) {
-            console.log("ERROR: Could not load existing playlist, will create new one");
-            __createNewPlaylist();
-        }
-    } else 
-        __createNewPlaylist();
-    
-}
-PlaylistDB.prototype = new DB();
-PlaylistDB.isPlaylistValid = function (playlistURI) {
-    if ("playlist" in localStorage) {
-        try {
-            models.Playlist.fromURI(localStorage["playlist"], initCallback);
-        } catch(err) {
-            console.log("ERROR: Could not load existing playlist, will create new one");
-            __createNewPlaylist();
-        }
-    }
-}
-PlaylistDB.linkUserPlaylist = function (playlistURI) {
-    models.Playlist.fromURI
-}

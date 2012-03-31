@@ -7,6 +7,8 @@ class Shelf extends CI_Controller {
 
     function __construct() {
         parent::__construct();
+		
+		$this->output->set_header('Access-Control-Allow-Origin: *');
     }
 
     public function index() {
