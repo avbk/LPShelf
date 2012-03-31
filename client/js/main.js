@@ -97,31 +97,6 @@ function drawAlbum(album) {
 		album: album
 	});
         
-<<<<<<< HEAD
-	imgs = $('div.sp-image');
-        
-	artistName = album.data.artist.name.toUpperCase();
-	albumYear  = album.data.year;
-
-	for (i = 0; i < imgs.length; i++) {
-		otherArtistName = $(imgs[i]).find('artist a').text().toUpperCase();
-
-		if (artistName < otherArtistName) {
-			$(imgs[i]).before(img);
-			return;
-		} else if (artistName == otherArtistName) {
-			otherAlbumYear = Number($(imgs[i]).find('year').text());
-			if (albumYear < otherAlbumYear) {
-				$(imgs[i]).before(img);
-				return;
-			}
-		}
-	}
-
-	$('body').append(img); 
-	// FIXME: this could be done better
-	$('buttonPlay').click(onButtonPlayClick);
-=======
     imgs = $('li.shelfItem');
         
     artistName = album.data.artist.name.toUpperCase();
@@ -145,7 +120,6 @@ function drawAlbum(album) {
     $('#shelf').append(img); 
     // FIXME: this could be done better
     $('buttonPlay').click(onButtonPlayClick);
->>>>>>> d79549441215ddd828e673dd3f55cd7d9fe53434
 }
 
 function handleArtistImport(artist) {
