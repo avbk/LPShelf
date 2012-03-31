@@ -104,7 +104,23 @@ function PlaylistDB(initCallback) {
     
     
     __createNewPlaylist = function() {
-        __playlist = new models.Playlist(".lpshelf");
+        /*
+         * TODO: when creating a new playlist, even with a name, the playlist.uri
+         * is empty. When renaming we can read the uri.
+         */
+        __playlist = new models.Playlist(".loading");
+        __playlist.observe(models.EVENT.RENAME, function (pl) {
+            console.log("onload");
+            console.log(__playlist.uri);
+            console.log(__playlist);
+            console.log(pl.uri);
+            console.log(pl);
+            
+        });
+        console.log(__playlist.uri);
+        console.log(__playlist);
+        __playlist.name = ".lpshelf";
+        localStorage["playlist"] = __playlist.uri;
         
         if (initCallback != null)
             window.setTimeout(initCallback, 0);
@@ -114,6 +130,7 @@ function PlaylistDB(initCallback) {
         try {
             models.Playlist.fromURI(localStorage["playlist"], initCallback);
         } catch(err) {
+            console.log("ERROR: Could not load existing playlist, will create new one");
             __createNewPlaylist();
         }
     } else 
@@ -121,3 +138,16 @@ function PlaylistDB(initCallback) {
     
 }
 PlaylistDB.prototype = new DB();
+PlaylistDB.isPlaylistValid = function (playlistURI) {
+    if ("playlist" in localStorage) {
+        try {
+            models.Playlist.fromURI(localStorage["playlist"], initCallback);
+        } catch(err) {
+            console.log("ERROR: Could not load existing playlist, will create new one");
+            __createNewPlaylist();
+        }
+    }
+}
+PlaylistDB.linkUserPlaylist = function (playlistURI) {
+    models.Playlist.fromURI
+}

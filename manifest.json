@@ -11,7 +11,7 @@
     "AppName": {
 		"en": "LP Shelf"
     },
-	"RequiredPermissions": [ "http://ws.spotify.com"],
+	"RequiredPermissions": [ "http://ws.spotify.com", "http://lulzhack.hydra.uberspace.de"],
     "SupportedLanguages": ["en"],
 	"AcceptedLinkTypes" : ["album", "artist"]
 }
