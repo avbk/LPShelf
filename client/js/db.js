@@ -22,12 +22,14 @@ function DB () {
      */
     this.foreach = function(callback) {}
     
-	/**
+    /**
      * Gets all album IDs as one list
      * 
 	 * @return				the list of saved albums
      */
-    this.listIDs = function() {return []}
+    this.listIDs = function() {
+        return []
+        }
     
     
     /**
@@ -47,28 +49,30 @@ function LocalStorageDB() {
         if (!this.contains(album))
             localStorage[__toID(album)] = true;    
 		
-		return __toURI(album);
+        return __toURI(album);
     }
     
     this.drop = function(album){
         if (this.contains(album))
             delete localStorage[__toID(album)];
 		
-		return __toURI(album);
+        return __toURI(album);
     }
     
     this.foreach = function(callback) {
         for (var id in localStorage)
-            models.Album.fromURI(__toURI(id), callback);
+            if (id.indexOf('__') == -1)
+                models.Album.fromURI(__toURI(id), callback);
     }
  
-	this.listIDs = function() {
-		result = [];
-		for (var id in localStorage)
-			result.push(id);
+    this.listIDs = function() {
+        result = [];
+        for (var id in localStorage)
+            if (id.indexOf('__') == -1)
+                result.push(id);
 		
-		return result;
-	}
+        return result;
+    }
 	
     this.contains = function(album) {
         return __toID(album) in localStorage;

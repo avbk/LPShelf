@@ -8,7 +8,8 @@ MSG = {
 CMD = {
 	INIT : 1,
 	ADD_ALBUM : 2,
-	DROP_ALBUM : 3
+	DROP_ALBUM : 3,
+        REFRESH : 4
 }
 
  
