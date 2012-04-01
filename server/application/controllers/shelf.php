@@ -7,7 +7,7 @@ class Shelf extends CI_Controller {
 
     function __construct() {
         parent::__construct();
-	$this->output->set_header('Access-Control-Allow-Origin: *');
+	$this->output->set_header('Access-Control-Allow-Origin: sp://lpshelf');
     }
 
     public function index() {
