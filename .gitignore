@@ -33,6 +33,14 @@ ehthumbs.db
 Icon?
 Thumbs.db
 
+# backup files, etc #
+#####################
+*.bak
+*~
+*.lock
+*.swp
+*.out
+
 
 # Private server data #
 #######################

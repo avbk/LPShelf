@@ -37,6 +37,7 @@ self.addEventListener('message', function(event) {
         case CMD.INIT:
             albums = msg.data.albums;
             anonId = msg.data.anonId;
+			lastUpdate = msg.data.lastUpdate;
         case CMD.REFRESH:	
             get('get/'+ anonId +'/' + lastUpdate, function (code, result) {
                 if (code == 204) {
@@ -44,22 +45,33 @@ self.addEventListener('message', function(event) {
                     if (albums.length == 0)
                         notify(MSG.NO_ALBUMS, null);
                 } else {
-                    
                     del = [];
                     add = [];
-                    for (i = 0; i < result.albums.length; i++)
-                        if (albums.indexOf(result.albums[i]) == -1)
-                            add.push(result.albums[i]);
-                    
-                    if (result.albums.length == 0)
-                        del = albums;
-                    else {
-                        for (i = 0; i < albums.length; i++)
-                            if (result.albums.indexOf(albums[i]) == -1)
-                                del.push(albums[i]);
-                    }
-                    albums = result.albums;
+                    if (result.type == 'delta') {
+						log("DELTA ONLY");
+						for (i = 0; i < result.albums.length; i++)
+							if (albums.indexOf(result.albums[i]) == -1) {
+								add.push(result.albums[i]);
+								albums.push(result.albums[i]);
+							}
 
+					} else if (result.type == 'full') {
+						log("FULL UPDATE");
+						for (i = 0; i < result.albums.length; i++)
+							if (albums.indexOf(result.albums[i]) == -1)
+								add.push(result.albums[i]);
+
+						if (result.albums.length == 0)
+							del = albums;
+						else {
+							for (i = 0; i < albums.length; i++)
+								if (result.albums.indexOf(albums[i]) == -1)
+									del.push(albums[i]);
+						}
+						albums = result.albums;	
+					} else
+						log("UNKOWN REFRESH TYPE");
+                    
                     log("Removing " + del.length + " albums");
                     log("Adding " + add.length + " albums");
                     
@@ -71,6 +83,7 @@ self.addEventListener('message', function(event) {
                         notify(MSG.NO_ALBUMS, null);
                 }
                 lastUpdate = +new Date;
+				notify(MSG.LAST_UPDATE, lastUpdate);
             });	
             break;
         case CMD.ADD_ALBUM:

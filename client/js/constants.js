@@ -2,7 +2,8 @@ MSG = {
 	LOG : 1,
 	NO_ALBUMS : 2,
 	ALBUM_ADDED : 3,
-	ALBUM_DROPPED : 4
+	ALBUM_DROPPED : 4,
+	LAST_UPDATE: 5
 }
 
 CMD = {

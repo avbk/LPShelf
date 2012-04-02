@@ -27,6 +27,9 @@ var Controller = function () {
                 if (albumDropped)
                     models.Album.fromURI(albumURI, albumDropped);
                 break;
+            case MSG.LAST_UPDATE:
+				localStorage['__lastUpdate'] = msg.data;
+                break;
         }
     }
 	
@@ -49,7 +52,8 @@ var Controller = function () {
             'id' : CMD.INIT,
             'data': {
                 'albums' : localDB.listIDs(),
-                'anonId' : models.session.anonymousUserID
+                'anonId' : models.session.anonymousUserID,
+                'lastUpdate' : '__lastUpdate' in localStorage ? localStorage['__lastUpdate'] : 0
             }
         });
     }
